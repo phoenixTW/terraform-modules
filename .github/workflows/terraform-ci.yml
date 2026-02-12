@@ -53,7 +53,9 @@ jobs:
             echo "No modules to test; setting empty matrix."
             echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
           else
-            echo "matrix={\"include\":$(echo "$MODULES" | jq '[.[] | {module: .}]')}" >> "$GITHUB_OUTPUT"
+            # Build a compact, single-line JSON object for the matrix definition
+            MATRIX_INCLUDE=$(echo "$MODULES" | jq -c '[.[] | {module: .}]')
+            echo "matrix={\"include\":$MATRIX_INCLUDE}" >> "$GITHUB_OUTPUT"
           fi
 
   terraform-checks:
