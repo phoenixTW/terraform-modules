@@ -22,7 +22,7 @@ resource "aws_subnet" "public" {
   cidr_block              = element(var.public_subnets, count.index)
   availability_zone       = element(var.availability_zones, count.index)
   count                   = length(var.public_subnets)
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = var.enable_public_ip_on_launch
 
   tags = merge(var.tags, {
     "type" = "public"
@@ -54,7 +54,7 @@ resource "aws_route" "public" {
 
 resource "aws_route_table_association" "public" {
   count          = length(var.public_subnets)
-  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
@@ -102,7 +102,7 @@ resource "aws_subnet" "database" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.database_subnets[count.index]
   availability_zone       = element(var.availability_zones, count.index)
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   tags = merge(var.tags, { "type" = "database" }, {
     "Name" = "${local.resource_prefix}.subnet.database" }
   )
@@ -111,7 +111,7 @@ resource "aws_subnet" "database" {
 resource "aws_db_subnet_group" "db_subnet_group" {
   count      = length(var.database_subnets) > 0 ? 1 : 0
   name       = "${var.service_name}-${var.env}-db-subnet-group"
-  subnet_ids = aws_subnet.database.*.id
+  subnet_ids = aws_subnet.database[*].id
   tags = merge(var.tags,
     { "Name" = "${local.resource_prefix}.db-subnet-group" }
   )

@@ -3,23 +3,23 @@ output "vpc_id" {
 }
 
 output "public_subnet_ids" {
-  value = aws_subnet.public.*.id
+  value = aws_subnet.public[*].id
 }
 
 output "public_subnet_cidr_blocks" {
-  value = aws_subnet.public.*.cidr_block
+  value = aws_subnet.public[*].cidr_block
 }
 
 output "private_subnet_ids" {
-  value = aws_subnet.private.*.id
+  value = aws_subnet.private[*].id
 }
 
 output "private_subnet_cidr_blocks" {
-  value = aws_subnet.private.*.cidr_block
+  value = aws_subnet.private[*].cidr_block
 }
 
 output "database_subnets_ids" {
-  value       = aws_subnet.database.*.id
+  value       = aws_subnet.database[*].id
   description = "List of databases subnets ID"
 }
 
