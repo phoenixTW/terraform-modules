@@ -3,13 +3,14 @@ MODULE ?=
 # Optional overrides
 TRIVY_FLAGS ?= --scanners misconfig
 
+MODULES ?= $(filter-out .github,$(shell ls -d */ 2>/dev/null | sed 's:/$::'))
+
 .PHONY: help \
 	terraform-fmt terraform-init terraform-validate \
 	tflint-init tflint \
 	trivy \
 	check \
-	check-module-var \
-	check-bastion_host check-common_vpc
+	check-module-var check-all
 
 help:
 	@echo "Terraform modules Makefile"
@@ -23,9 +24,8 @@ help:
 	@echo "  make tflint MODULE=<module_dir>          # Run tflint"
 	@echo "  make trivy MODULE=<module_dir>           # Run trivy fs misconfig scan"
 	@echo
-	@echo "Shortcuts:"
-	@echo "  make check-bastion_host                  # Run checks for bastion_host/"
-	@echo "  make check-common_vpc                    # Run checks for common_vpc/"
+	@echo "Batch:"
+	@echo "  make check-all                           # Run checks for all modules (top-level dirs except .github/)"
 
 check-module-var:
 	@if [ -z "$(MODULE)" ]; then \
@@ -59,10 +59,10 @@ trivy: check-module-var
 	@echo "Running trivy misconfig scan for $(MODULE)..."
 	trivy fs $(TRIVY_FLAGS) "$(MODULE)"
 
-# Convenience targets for current modules
-check-bastion_host:
-	@$(MAKE) check MODULE=bastion_host
-
-check-common_vpc:
-	@$(MAKE) check MODULE=common_vpc
-
+check-all:
+	@echo "Running checks for modules: $(MODULES)"
+	@for m in $(MODULES); do \
+		echo ""; \
+		echo "=== Running checks for $$m ==="; \
+		$(MAKE) check MODULE=$$m || exit $$?; \
+	done
