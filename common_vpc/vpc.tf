@@ -54,7 +54,7 @@ resource "aws_route" "public" {
 
 resource "aws_route_table_association" "public" {
   count          = length(var.public_subnets)
-  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
@@ -111,7 +111,7 @@ resource "aws_subnet" "database" {
 resource "aws_db_subnet_group" "db_subnet_group" {
   count      = length(var.database_subnets) > 0 ? 1 : 0
   name       = "${var.service_name}-${var.env}-db-subnet-group"
-  subnet_ids = aws_subnet.database.*.id
+  subnet_ids = aws_subnet.database[*].id
   tags = merge(var.tags,
     { "Name" = "${local.resource_prefix}.db-subnet-group" }
   )
