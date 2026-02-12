@@ -28,6 +28,12 @@ resource "aws_iam_instance_profile" "bastion_profile" {
   role = aws_iam_role.bastion_role.name
 }
 
+resource "aws_cloudwatch_log_group" "bastion" {
+  name              = "/aws/ec2/${local.name_prefix}-bastion"
+  retention_in_days = 30
+  kms_key_id        = var.bastion_logs_kms_key_id
+}
+
 data "aws_iam_policy_document" "cloudwatch_logs_policy" {
   statement {
     sid = "1"
@@ -39,7 +45,7 @@ data "aws_iam_policy_document" "cloudwatch_logs_policy" {
     ]
     effect = "Allow"
     resources = [
-      "*"
+      aws_cloudwatch_log_group.bastion.arn
     ]
   }
 }

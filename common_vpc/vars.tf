@@ -42,15 +42,26 @@ variable "enable_dns_hostnames" {
   default     = false
 }
 
+variable "enable_public_ip_on_launch" {
+  type        = bool
+  description = "Whether to assign public IP addresses on launch for subnets that need internet access"
+  default     = false
+}
+
 variable "enable_flow_logs" {
   type        = bool
   description = "Should be true to enable flow logs in the VPC"
-  default     = false
+  default     = true
 }
 
 variable "flow_log_retention_days" {
   type        = number
   description = "The number of days to retain flow logs"
   default     = 30
+}
+
+variable "flow_logs_kms_key_id" {
+  type        = string
+  description = "KMS key ID or ARN to encrypt the VPC flow logs CloudWatch log group"
 }
 

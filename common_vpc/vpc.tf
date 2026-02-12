@@ -22,7 +22,7 @@ resource "aws_subnet" "public" {
   cidr_block              = element(var.public_subnets, count.index)
   availability_zone       = element(var.availability_zones, count.index)
   count                   = length(var.public_subnets)
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = var.enable_public_ip_on_launch
 
   tags = merge(var.tags, {
     "type" = "public"
@@ -102,7 +102,7 @@ resource "aws_subnet" "database" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.database_subnets[count.index]
   availability_zone       = element(var.availability_zones, count.index)
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   tags = merge(var.tags, { "type" = "database" }, {
     "Name" = "${local.resource_prefix}.subnet.database" }
   )

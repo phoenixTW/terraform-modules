@@ -9,6 +9,10 @@ terraform {
   }
 }
 
+data "aws_vpc" "this" {
+  id = var.vpc_id
+}
+
 resource "aws_security_group" "bastion_ec2_sg" {
   name        = "${local.name_prefix}-bastion-sg"
   description = "Security group created for ${local.name_prefix} bastion"
@@ -20,27 +24,29 @@ resource "aws_security_group" "bastion_ec2_sg" {
 
 resource "aws_vpc_security_group_egress_rule" "allow_bastion_internet_access_over_http" {
   security_group_id = aws_security_group.bastion_ec2_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = data.aws_vpc.this.cidr_block
   from_port         = 80
   ip_protocol       = "tcp"
   to_port           = 80
+  description       = "Allow HTTP egress within VPC CIDR"
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_bastion_internet_access_over_https" {
   security_group_id = aws_security_group.bastion_ec2_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = data.aws_vpc.this.cidr_block
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
+  description       = "Allow HTTPS egress within VPC CIDR"
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_bastion_to_connect_to_all_rds" {
   security_group_id = aws_security_group.bastion_ec2_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = data.aws_vpc.this.cidr_block
   from_port         = 55432
   ip_protocol       = "tcp"
   to_port           = 55432
-  description       = "Allow bastion to connect to all RDS"
+  description       = "Allow bastion to connect to all RDS within the VPC CIDR"
 }
 
 resource "aws_instance" "bastion_ec2" {
