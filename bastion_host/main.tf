@@ -1,3 +1,14 @@
+terraform {
+  required_version = ">= 1.7.0, < 2.0.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0.0"
+    }
+  }
+}
+
 resource "aws_security_group" "bastion_ec2_sg" {
   name        = "${local.name_prefix}-bastion-sg"
   description = "Security group created for ${local.name_prefix} bastion"
