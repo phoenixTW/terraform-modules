@@ -39,7 +39,8 @@ jobs:
 
           MODULE_DIRS=$(echo "$CHANGED_FILES" | awk -F'/' 'NF>1 {print $1}' | sort -u)
 
-          MODULES_JSON=$(printf '%s\n' "$MODULE_DIRS" | jq -R . | jq -s .)
+          # Build a compact, single-line JSON array to satisfy GITHUB_OUTPUT format
+          MODULES_JSON=$(printf '%s\n' "$MODULE_DIRS" | jq -R . | jq -s -c .)
 
           echo "Detected module directories: $MODULES_JSON"
           echo "modules=$MODULES_JSON" >> "$GITHUB_OUTPUT"
