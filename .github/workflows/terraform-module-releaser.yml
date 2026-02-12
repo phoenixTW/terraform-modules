@@ -1,3 +1,5 @@
+# Changelog and wiki: requires repo Wiki enabled in Settings and an initial page
+# (e.g. Home) created manually. See README "Release automation and wiki".
 name: Terraform Module Releaser
 
 on:
@@ -19,6 +21,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history required for changelog generation and tag/release creation
+          fetch-depth: 0
 
       - name: Terraform Module Releaser
         uses: techpivot/terraform-module-releaser@v1
@@ -28,6 +33,7 @@ jobs:
           patch-keywords: "fix,chore,docs,refactor,style,perf,test,ci"
           default-semver-level: patch
           default-first-tag: v1.0.0
+          terraform-docs-version: v0.20.0
           delete-legacy-tags: true
           disable-wiki: false
           wiki-sidebar-changelog-max: 10
